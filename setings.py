@@ -13,5 +13,7 @@ default_kwargs = {
 	"initial_group":20,
 	"initial_group_size":8,
 	"birth_rate":4*pow(10,-1),
-	"altruist_proportion":3*pow(10,-1),
+	"genetic_proportion":{
+		"altruist_proportion":3*pow(10,-1),
+	}
 }

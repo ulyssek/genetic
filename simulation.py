@@ -16,19 +16,23 @@ from logger import Logger
 class Simulation():
 
 
+	LOGGING_FUNCTIONS={
+		"group_number" 		: lambda self : sum(map(lambda x : len(x.persons)>0,self.groups)),
+		"person_number" 	: lambda self : sum(map(lambda x : len(x.persons),self.groups)),
+		"altruist_proportion"	: lambda self : self.total_person_proportion("altruism"),
+		"advantage_proportion"	: lambda self : self.total_person_proportion("advantage"),
+	}
 
-	def __init__(self,kwargs=default_kwargs,altruism_activated=False):
+
+
+	def __init__(self,kwargs=default_kwargs,altruism_activated=False,logging_keys=[]):
 		for key in kwargs.keys():
 			self.__setattr__(key,kwargs[key])
 		self.groups = []
 		for i in range(self.initial_group):
-			self.groups.append(Group(self.food_cost,self.initial_group_size,self.altruist_proportion))
+			self.groups.append(self.create_group())
 		self.altruism_activated = altruism_activated
-		logging_keys = [
-			"group_number",
-			"person_number",
-			"altruist_proportion",
-			]
+		self.logging_keys = logging_keys
 		self.logger = Logger(self,logging_keys)
 
 	def run(self):
@@ -47,12 +51,21 @@ class Simulation():
 		self.log()
 
 	def log(self):
-		group_number = sum(map(lambda x : len(x.persons)>0,self.groups))
-		person_number = sum(map(lambda x : len(x.persons),self.groups))
-		altruist_proportion = self.total_altruist_proportion()
-		values = [group_number,person_number,altruist_proportion]
+		values = list(map(lambda x : self.LOGGING_FUNCTIONS[x](self),self.logging_keys))
 		self.logger.log(values)
 
+	def create_group(self,group_size=None):
+		if group_size is None:
+			group_size=self.initial_group_size
+		group = Group(
+			self.food_cost,
+			self.genetic_proportion,
+			self.advantage,
+			self.lifespan,
+			group_size,
+		)
+		return group
+	
 
 	def altruism(self):
 		for group in self.groups:
@@ -63,15 +76,24 @@ class Simulation():
 		selfish = 0
 		for group in self.groups:
 			for person in group.persons:
-				altruists += int(person.altruism)
-				selfish += 1-int(person.altruism)
+				altruists += int(person.genom["altruism"])
+				selfish += 1-int(person.genom["altruism"])
 
 		return float(altruists)/(altruists+selfish)
+
+	def total_person_proportion(self,gene):
+		positive=0
+		negative=0
+		for group in self.groups:
+			for person in group.persons:
+				positive += int(person.genom[gene])
+				negative += 1-int(person.genom[gene])
+		return float(positive)/max(1,(positive+negative))
 
 	def split_group(self):
 		for group in self.groups:
 			if group.get_size() > self.group_size:
-				self.groups.append(Group(self.food_cost,0,self.altruist_proportion))
+				self.groups.append(self.create_group(0))
 				last_group = self.groups[-1]
 				last_group.persons = group.persons[:int(self.group_size/2):]
 				group.persons = group.persons[int(self.group_size/2)::]
@@ -82,7 +104,7 @@ class Simulation():
 
 	def give_birth(self):
 		for group in self.groups:
-			group.give_birth(self.birth_rate)
+			group.give_birth()
 
 	def step(self):
 		total = self.collect_total()
