@@ -73,16 +73,6 @@ class Simulation():
 		for group in self.groups:
 			group.altruism()
 
-	def total_altruist_proportion(self):
-		altruists = 0
-		selfish = 0
-		for group in self.groups:
-			for person in group.persons:
-				altruists += int(person.genom["altruism"])
-				selfish += 1-int(person.genom["altruism"])
-
-		return float(altruists)/(altruists+selfish)
-
 	def total_person_proportion(self,gene):
 		positive=0
 		negative=0
