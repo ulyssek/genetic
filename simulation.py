@@ -25,13 +25,13 @@ class Simulation():
 
 
 
-	def __init__(self,kwargs=default_kwargs,altruism_activated=False,logging_keys=[]):
+	def __init__(self,kwargs=default_kwargs,logging_keys=[]):
 		for key in kwargs.keys():
 			self.__setattr__(key,kwargs[key])
 		self.groups = []
 		for i in range(self.initial_group):
 			self.groups.append(self.create_group())
-		self.altruism_activated = altruism_activated
+		self.altruism_activated = ("altruism" in kwargs["genetic_proportion"].keys())
 		self.logging_keys = logging_keys
 		self.logger = Logger(self,logging_keys)
 
@@ -47,7 +47,6 @@ class Simulation():
 		self.split_group()
 		if self.altruism_activated:
 			self.altruism()
-		#print(self.total_altruist_proportion())
 		self.log()
 
 	def log(self):
@@ -101,15 +100,6 @@ class Simulation():
 	def step(self):
 		total = self.collect_total()
 		self.give_food(total)
-
-
-	def count_persons(self):
-		print(str(len(self.groups))+' groups')
-		for i,group in enumerate(self.groups):
-			print('group ' + str(i) + ' : ' + str(len(group.persons)))
-			print('altruists proportion : ' + str(group.get_altruist_proportion()))
-		print('altruist proportion : ' + str(self.total_altruist_proportion()))
-		
 
 	def collect_total(self):
 		total_score = 0

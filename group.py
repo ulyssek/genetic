@@ -64,9 +64,3 @@ class Group():
 
 	def get_size(self):
 		return len(self.persons)
-
-	def get_altruist_proportion(self):
-		altruists = 0
-		for person in self.persons:
-			altruists += int(person.genom["altruism"])
-		return float(altruists)/max(1,len(self.persons))
