@@ -2,6 +2,7 @@
 
 
 from simulation import Simulation
+import numpy as np
 
 
 
@@ -13,6 +14,7 @@ class Experiment():
 		self.simulation_kwargs = simulation_kwargs
 		self.sample_size = sample_size
 		self.simulation_step = simulation_step
+		self.studied_function = studied_function
 		self.result = []
 
 
@@ -23,6 +25,19 @@ class Experiment():
 			for j in range(self.simulation_step):
 				s.run()
 			s.step()
-			self.result.append(studied_function)
+			self.result.append(self.studied_function(s))
 			
 		
+	def get_mean(self):
+		return np.mean(self.result)
+
+	def get_var(self):
+		return np.var(self.result)
+
+
+	def get_confidence_interval(self):
+		if len(self.result) >= 30:
+			a = 1.96*self.get_var()/np.sqrt(len(self.result))
+			return (self.get_mean()-a,self.get_mean()+a)
+
+	

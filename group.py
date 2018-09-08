@@ -10,11 +10,12 @@ class Group():
 
 
 
-	def __init__(self,food_cost,genetic_proportion,advantage,lifespan,initial_group_size=0):
+	def __init__(self,food_cost,genetic_proportion,advantage,lifespan,birth_rate,initial_group_size=0):
 		self.persons = []
 		self.food_cost = food_cost
 		self.advantage=advantage
 		self.lifespan = lifespan
+		self.birth_rate = birth_rate
 		for i in range(initial_group_size):
 			genom = {}
 			for gene in genetic_proportion.keys():
@@ -24,7 +25,7 @@ class Group():
 
 
 	def create_person(self,genom):
-		person = Person(genom,self.advantage)
+		person = Person(genom,self.birth_rate,self.advantage)
 		return(person)
 
 

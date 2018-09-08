@@ -51,8 +51,9 @@ class Simulation():
 		self.log()
 
 	def log(self):
-		values = list(map(lambda x : self.LOGGING_FUNCTIONS[x](self),self.logging_keys))
-		self.logger.log(values)
+		if self.logging_keys != []:
+			values = list(map(lambda x : self.LOGGING_FUNCTIONS[x](self),self.logging_keys))
+			self.logger.log(values)
 
 	def create_group(self,group_size=None):
 		if group_size is None:
@@ -62,6 +63,7 @@ class Simulation():
 			self.genetic_proportion,
 			self.advantage,
 			self.lifespan,
+			self.birth_rate,
 			group_size,
 		)
 		return group
