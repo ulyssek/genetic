@@ -38,17 +38,12 @@ class Group():
 						p2.food += p.food - self.food_cost
 						p.food -= self.food_cost			 
 
-	def age_persons(self):
-		for person in self.persons:
-			person.age += 1
-
 	def kill_weaks(self,food_cost):
-		self.age_persons()
 		index = []
 		for i in range(len(self.persons)):
-			person = self.persons[i]
-			person.food -= food_cost
-			if person.food < 0 or person.age >= self.lifespan:
+			self.persons[i].aged()
+			self.persons[i].food -= food_cost
+			if self.persons[i].food < 0 or self.persons[i].age >= self.lifespan:
 				index.append(i)
 		for i in index[::-1]:
 			#print("weak killed")
@@ -56,7 +51,6 @@ class Group():
 
 
 	def give_birth(self):
-		scale = 10000
 		for i in range(len(self.persons)):
 			new_born = self.persons[i].give_birth()
 			if new_born is not None:

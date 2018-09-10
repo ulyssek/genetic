@@ -28,20 +28,23 @@ class Person():
 				self.genom[key]=True
 		else:
 			self.genom = genom
-		self.advantage=advantage
+		try:
+			self.advantage=float(advantage)*int(self.genom["advantage"])
+		except KeyError:
+			self.advantage = 0.0
 		self.birth_rate=birth_rate
 		self.mutation_rate = self.get_rate_from_gene("mutation") 
 
 
 	def new_score(self):
-		self.score = randint(1,100)+self.advantage*int(self.genom["advantage"])
+		self.score = randint(1,100)+self.advantage
+		return self.score
 
 	def give_birth(self):
-		scale = 10000
-		new_genom = {}
-		if randint(1,scale)< self.birth_rate*scale:
+		if randint(1,100)< self.birth_rate:
+			new_genom = {}
 			for gene in self.genom:
-				new_genom[gene] = self.genom[gene]!=(randint(1,99)<=(self.mutation_rate*100))
+				new_genom[gene] = self.genom[gene]!=(randint(1,99)<=self.mutation_rate)
 			return self.create_person(new_genom) 
 		
 
@@ -58,8 +61,11 @@ class Person():
 				genom_keys.append(gene)
 		return genom_keys
 
-	def receive_food(self,total,food):
-		self.food += food*float(self.score)/total
+	def receive_food(self,food_ratio):
+		self.food += food_ratio*self.score
+
+	def aged(self):
+		self.age += 1
 
 	def get_rate_from_gene(self,gene_name):
 		rate = 0
@@ -72,4 +78,4 @@ class Person():
 					power=max(int(a[1]),power)
 				except:
 					pass
-		return float(rate)/pow(2,power+1)
+		return float(rate)/pow(2,power+0)*100
