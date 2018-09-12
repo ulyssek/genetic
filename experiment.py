@@ -9,6 +9,9 @@ from timeit import time
 
 from multiprocessing import Pool
 
+from scipy.special import stdtrit
+
+from math import sqrt
 
 
 def do(args):
@@ -47,7 +50,7 @@ class Experiment():
 		print("Computation over")
 
 	def print_progression(self,i):
-		if ((i+1) % int(self.sample_size/10) == 0):
+		if ((i+1) % max(1,int(self.sample_size/10)) == 0):
 			self.temp_time = time.time()
 			exec_time = self.temp_time - self.starting_time
 			rounded_time = int(exec_time*10)/float(10)
@@ -61,9 +64,12 @@ class Experiment():
 		return np.var(self.result)
 
 
-	def get_confidence_interval(self):
+	def get_confidence_interval(self,alpha=0.05):
 		if len(self.result) >= 30:
-			a = 1.96*self.get_var()/np.sqrt(len(self.result))
-			return (self.get_mean()-a,self.get_mean()+a)
+			n = self.sample_size
+			tvalue = stdtrit(n,1-alpha)
+			mu = self.get_mean()
+			s = sqrt(self.get_var())
+			return (mu - tvalue*s/sqrt(n),mu + tvalue*s/sqrt(n))
 
 	
