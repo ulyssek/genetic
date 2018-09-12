@@ -22,6 +22,10 @@ class Simulation():
 		"person_number" 	: lambda self : sum(map(lambda x : len(x.persons),self.groups)),
 		"altruist_proportion"	: lambda self : self.total_person_proportion("altruism"),
 		"advantage_proportion"	: lambda self : self.total_person_proportion("advantage"),
+		"average_mutation_rate" : lambda self : self.get_average_gene_rate("mutation"),
+		"average_inner_rate" 	: lambda self : self.get_average_gene_rate("innervalue"),
+		"temp_advantage"	: lambda self : self.compute_advantage_reference(),
+		"average_lifespan"	: lambda self : self.get_average_gene_rate("lifespan"),
 	}
 
 
@@ -86,6 +90,7 @@ class Simulation():
 	"""
 
 	def run(self):
+		self.advantage_reference = self.compute_advantage_reference()
 		for i in range(self.season_number):
 			self.step()
 		self.kill_weaks()
@@ -98,6 +103,12 @@ class Simulation():
 		if self.take_over_activated:
 			self.take_over()
 		self.current_step += 1
+
+	def compute_advantage_reference(self):
+		k = self.advantage_reference_frequency
+		i = self.current_step
+		return self.advantage_reference_amplitude*(k/2+(k*1.5-(((k*2)-i%(k*2))+(i%k)))/(k/2)*((k/2)-(i%k)))/self.advantage_reference_frequency+self.advantage_reference_base
+		
 
 	def take_over(self):
 		if self.total_person_proportion(self.take_over_key) == 1:
@@ -118,8 +129,8 @@ class Simulation():
 		group = Group(
 			self.food_cost,
 			self.genetic_proportion,
-			self.advantage,
-			self.lifespan,
+			self.advantage_scale,
+			self.lifespan_scale,
 			self.birth_rate,
 			group_size,
 		)
@@ -138,6 +149,15 @@ class Simulation():
 				positive += int(person.genom[gene])
 				negative += 1-int(person.genom[gene])
 		return float(positive)/max(1,(positive+negative))
+
+	def get_average_gene_rate(self,gene):
+		current_sum = 0
+		current_count = 0
+		for group in self.groups:
+			for person in group.persons:
+				current_sum += person.get_rate_from_gene(gene)
+				current_count += 1
+		return float(current_sum)/current_count
 
 	def split_group(self):
 		for group in self.groups:
@@ -163,7 +183,7 @@ class Simulation():
 		total_score = 0
 		for group in self.groups:
 			for person in group.persons:
-				total_score += person.new_score()
+				total_score += person.new_score(self.advantage_reference)
 		return total_score
 
 
