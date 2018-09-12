@@ -14,6 +14,7 @@ from timeit import time
 
 
 
+
 class Simulation():
 
 
@@ -141,6 +142,7 @@ class Simulation():
 		for group in self.groups:
 			group.altruism()
 
+	@staticmethod
 	def total_person_proportion(self,gene):
 		positive=0
 		negative=0
@@ -193,3 +195,8 @@ class Simulation():
 			for person in group.persons:
 				person.receive_food(food_ratio)
 
+	def function_list(self,function_number):
+		l = [
+			lambda : self.total_person_proportion(self,"advantage"),
+		]
+		return l[function_number]()

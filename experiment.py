@@ -7,7 +7,19 @@ from logging import log
 
 from timeit import time
 
+from multiprocessing import Pool
 
+
+
+def do(args):
+	self = args[0]
+	i = args[1]
+	s = self.simulation_class(kwargs=self.simulation_kwargs)
+	for j in range(self.simulation_step):
+		s.run()
+	self.result.append(s.function_list(self.studied_function))
+	self.print_progression(i)
+	return s.function_list(self.studied_function)
 
 class Experiment():
 
@@ -19,28 +31,29 @@ class Experiment():
 		self.simulation_step = simulation_step
 		self.studied_function = studied_function
 		self.result = []
-
-
+		pass
 
 	def run(self):
 		print("Launching experiment, sample size : %s, step number : %s" % (self.sample_size,self.simulation_step))
-		last_signal = 0
-		starting_time = time.time()
+		self.progression = 0
+		self.starting_time = time.time()
+		l = []
 		for i in range(self.sample_size):
-			s = self.simulation_class(kwargs=self.simulation_kwargs)
-			for j in range(self.simulation_step):
-				s.run()
-			self.result.append(self.studied_function(s))
-			if ((i+1) % int(self.sample_size/10) == 0) and (self.sample_size/5 > last_signal):
-				temp_time = time.time()
-				exec_time = temp_time - starting_time
-				rounded_time = int(exec_time*10)/float(10)
-				print("%s percent of the simulation done (%s simulations), exec time : %s seconds" % (int(float(i+1)/self.sample_size*100),i+1,rounded_time))
-				starting_time = temp_time
+			l.append((self,i))
+		pool = Pool()
+		self.result = pool.map(do,l)
+		pool.close()
+		pool.join()
 		print("Computation over")
 
-			
-		
+	def print_progression(self,i):
+		if ((i+1) % int(self.sample_size/10) == 0):
+			self.temp_time = time.time()
+			exec_time = self.temp_time - self.starting_time
+			rounded_time = int(exec_time*10)/float(10)
+			print("%s percent of the simulation done (%s simulations), exec time : %s seconds" % (int(float(i+1)/self.sample_size*100),i+1,rounded_time))
+			self.starting_time = self.temp_time
+
 	def get_mean(self):
 		return np.mean(self.result)
 
