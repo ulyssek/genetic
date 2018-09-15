@@ -26,7 +26,9 @@ class Person():
 	}
 
 
-	def __init__(self,genom,birth_rate,advantage_scale,lifespan_scale):
+	def __init__(self,genom,kwargs):
+		for key in kwargs.keys():
+			self.__setattr__(key,kwargs[key])
 		self.food = 0
 		self.age = 0
 		self.genom= dict(self.DEFAULT_GENOTYPE)
@@ -35,13 +37,11 @@ class Person():
 				self.genom[key]=True
 		else:
 			self.genom = genom
-		self.advantage_scale = advantage_scale
-		self.lifespan_scale = lifespan_scale
-		self.birth_rate=birth_rate
 		self.gene_rate = {}
 		self.gene_rate["mutation"] 	= self.get_rate_from_gene("mutation") 
 		self.gene_rate["innervalue"] 	= self.get_rate_from_gene("innervalue")
 		self.gene_rate["lifespan"]	= self.lifespan_scale*(self.get_rate_from_gene("lifespan")+1)
+		self.gene_rate["birth_rate"]	= self.birth_rate_scale/max(1,self.get_rate_from_gene("birth_rate"))
 		try:
 			self.advantage = bool(self.genom["advantage"])
 		except KeyError:
@@ -56,7 +56,8 @@ class Person():
 		return self.score
 
 	def give_birth(self):
-		if randint(1,100)< self.birth_rate:
+		if randint(1,100)< self.gene_rate["birth_rate"] and self.food > self.child_cost:
+			self.food -= self.child_cost
 			new_genom = {}
 			for gene in self.genom:
 				new_genom[gene] = self.genom[gene]!=(randint(1,99)<=self.gene_rate["mutation"])
@@ -64,7 +65,14 @@ class Person():
 		
 
 	def create_person(self,genom):
-		return Person(genom,self.birth_rate,self.advantage_scale,self.lifespan_scale)
+		person_kwargs = {
+			#"birth_rate":self.birth_rate,
+			"advantage_scale":self.advantage_scale,
+			"lifespan_scale":self.lifespan_scale,
+			"child_cost":self.child_cost,
+			"birth_rate_scale":self.birth_rate_scale,
+		}
+		return Person(genom,person_kwargs)
 
 	def get_score(self):
 		return self.score

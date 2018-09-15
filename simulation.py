@@ -23,10 +23,11 @@ class Simulation():
 		"person_number" 	: lambda self : sum(map(lambda x : len(x.persons),self.groups)),
 		"altruist_proportion"	: lambda self : self.total_person_proportion("altruism"),
 		"advantage_proportion"	: lambda self : self.total_person_proportion("advantage"),
+		"temp_advantage"	: lambda self : self.compute_advantage_reference(),
 		"average_mutation_rate" : lambda self : self.get_average_gene_rate("mutation"),
 		"average_inner_rate" 	: lambda self : self.get_average_gene_rate("innervalue"),
-		"temp_advantage"	: lambda self : self.compute_advantage_reference(),
 		"average_lifespan"	: lambda self : self.get_average_gene_rate("lifespan"),
+		"average_birth_rate"	: lambda self : self.get_average_gene_rate("birth_rate"),
 	}
 
 
@@ -130,9 +131,7 @@ class Simulation():
 		group = Group(
 			self.food_cost,
 			self.genetic_proportion,
-			self.advantage_scale,
-			self.lifespan_scale,
-			self.birth_rate,
+			self.person_attribute,
 			group_size,
 		)
 		return group
@@ -142,7 +141,6 @@ class Simulation():
 		for group in self.groups:
 			group.altruism()
 
-	@staticmethod
 	def total_person_proportion(self,gene):
 		positive=0
 		negative=0
@@ -197,6 +195,9 @@ class Simulation():
 
 	def function_list(self,function_number):
 		l = [
-			lambda : self.total_person_proportion(self,"advantage"),
+			lambda : self.total_person_proportion("advantage"),
+			lambda : self.get_take_over_step(),
+			lambda : self.get_average_gene_rate("birth_rate"),
+			lambda : self.get_average_gene_rate("mutation"),
 		]
 		return l[function_number]()

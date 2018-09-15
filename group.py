@@ -10,12 +10,10 @@ class Group():
 
 
 
-	def __init__(self,food_cost,genetic_proportion,advantage_scale,lifespan_scale,birth_rate,initial_group_size=0):
+	def __init__(self,food_cost,genetic_proportion,person_attribute,initial_group_size=0):
 		self.persons = []
+		self.person_attribute=person_attribute
 		self.food_cost = food_cost
-		self.advantage_scale=advantage_scale
-		self.lifespan_scale = lifespan_scale
-		self.birth_rate = birth_rate
 		for i in range(initial_group_size):
 			genom = {}
 			for gene in genetic_proportion.keys():
@@ -25,7 +23,7 @@ class Group():
 
 
 	def create_person(self,genom):
-		person = Person(genom,self.birth_rate,self.advantage_scale,self.lifespan_scale)
+		person = Person(genom,self.person_attribute)#self.birth_rate,self.advantage_scale,self.lifespan_scale,child_cost)
 		return(person)
 
 
@@ -46,7 +44,6 @@ class Group():
 			if self.persons[i].food < 0 or self.persons[i].age >= self.persons[i].gene_rate["lifespan"]:
 				index.append(i)
 		for i in index[::-1]:
-			#print("weak killed")
 			self.persons.pop(i)
 
 
