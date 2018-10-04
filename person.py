@@ -2,6 +2,7 @@
 
 
 from random import randint
+from tools import hat_function
 
 
 class Person():
@@ -38,6 +39,12 @@ class Person():
 		else:
 			self.genom = genom
 		self.gene_rate = {}
+		self.get_rate_from_gene = self.get_rate_from_gene_1
+		try:
+			if self.genom["gene_rate_alternative"]:
+				self.gene_rate_from_gene = self.gene_rate_from_gene_2
+		except:
+			pass		
 		self.gene_rate["mutation"] 	= self.get_rate_from_gene("mutation") 
 		self.gene_rate["innervalue"] 	= self.get_rate_from_gene("innervalue")
 		self.gene_rate["lifespan"]	= self.lifespan_scale*(self.get_rate_from_gene("lifespan")+1)
@@ -49,7 +56,7 @@ class Person():
 
 
 	def compute_advantage_score(self,advantage_reference):
-		return int(self.advantage)*self.advantage_scale*max(0,10-abs(advantage_reference - self.gene_rate["innervalue"]))/10.0
+		return int(self.advantage)*hat_function(10,self.advantage_scale,advantage_reference,self.gene_rate["innervalue"])
 
 	def new_score(self,advantage_reference):
 		self.score = randint(1,100)+self.compute_advantage_score(advantage_reference)
@@ -90,7 +97,7 @@ class Person():
 	def aged(self):
 		self.age += 1
 
-	def get_rate_from_gene(self,gene_name):
+	def get_rate_from_gene_1(self,gene_name):
 		if gene_name in self.gene_rate.keys():
 			return self.gene_rate[gene_name]
 		rate = 0
@@ -104,3 +111,19 @@ class Person():
 				except:
 					pass
 		return float(rate)/pow(2,power+1)*100
+
+
+	def get_rate_from_gene_2(self,gene_name):
+		if gene_name in self.gene_rate.keys():
+			return self.gene_rate[gene_name]
+		rate = 0
+		power = 0
+		for key in self.genom.keys():
+			a = key.split(gene_name)
+			if len(a)==2 and a[0]=='':
+				try:
+					rate+=int(self.genom[key])
+					power+=1
+				except:
+					pass
+		return 100.*rate/max(1,power)

@@ -45,10 +45,15 @@ class Experiment():
 		for i in range(self.exploration_size,self.sample_size):
 			l.append((self,i,True))
 		pool = Pool()
-		self.result = pool.map(do,l)
+		self.result.extend(pool.map(do,l))
 		pool.close()
 		pool.join()
 		print("Computation over")
+
+	def run_more(self,sample_size):
+		self.sample_size = sample_size
+		self.run()
+
 
 	def compute_sample_size(self):
 		print("Computing sample size")
@@ -78,7 +83,7 @@ class Experiment():
 
 	def get_confidence_interval(self,alpha=0.05):
 		#if len(self.result) >= 30:
-		n = self.sample_size
+		n = len(self.result)
 		tvalue = stdtrit(n,1-alpha)
 		mu = self.get_mean()
 		s = sqrt(self.get_var())

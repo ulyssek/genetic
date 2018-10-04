@@ -23,6 +23,7 @@ class Simulation():
 		"person_number" 	: lambda self : sum(map(lambda x : len(x.persons),self.groups)),
 		"altruist_proportion"	: lambda self : self.total_person_proportion("altruism"),
 		"advantage_proportion"	: lambda self : self.total_person_proportion("advantage"),
+		"alternative_gene_rate_proportion": lambda self : self.total_person_proportion("gene_rate_alternative"),
 		"temp_advantage"	: lambda self : self.compute_advantage_reference(),
 		"average_mutation_rate" : lambda self : self.get_average_gene_rate("mutation"),
 		"average_inner_rate" 	: lambda self : self.get_average_gene_rate("innervalue"),
@@ -199,5 +200,6 @@ class Simulation():
 			lambda : self.get_take_over_step(),
 			lambda : self.get_average_gene_rate("birth_rate"),
 			lambda : self.get_average_gene_rate("mutation"),
+			lambda : self.total_person_proportion("gene_rate_alternative")
 		]
 		return l[function_number]()
