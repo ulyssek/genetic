@@ -2,7 +2,7 @@
 
 
 from person import Person
-from random import randint
+from random import randint,shuffle
 
 
 
@@ -55,3 +55,18 @@ class Group():
 
 	def get_size(self):
 		return len(self.persons)
+
+	def sexual_reproduction(self):
+		reproducer = []
+		for i in range(len(self.persons)):
+			if self.persons[i].want_to_give_birth():
+				reproducer.append(persons[i])
+		shuffle(reproducer)
+		
+		
+
+
+
+
+
+

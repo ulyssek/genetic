@@ -8,6 +8,7 @@ from setings import default_kwargs
 from group import Group
 from logger import Logger
 from timeit import time
+from tools import hat_function
 
 
 
@@ -94,6 +95,7 @@ class Simulation():
 
 	def run(self):
 		self.advantage_reference = self.compute_advantage_reference()
+		self.advantage_function = self.compute_advantage_function(self.compute_score_function)
 		for i in range(self.season_number):
 			self.step()
 		self.kill_weaks()
@@ -158,7 +160,7 @@ class Simulation():
 			for person in group.persons:
 				current_sum += person.get_rate_from_gene(gene)
 				current_count += 1
-		return float(current_sum)/current_count
+		return float(current_sum)/max(1,current_count)
 
 	def split_group(self):
 		for group in self.groups:
@@ -184,7 +186,7 @@ class Simulation():
 		total_score = 0
 		for group in self.groups:
 			for person in group.persons:
-				total_score += person.new_score(self.advantage_reference)
+				total_score += person.new_score(self.advantage_function)
 		return total_score
 
 
@@ -203,3 +205,19 @@ class Simulation():
 			lambda : self.total_person_proportion("gene_rate_alternative")
 		]
 		return l[function_number]()
+	
+	def compute_advantage_function(self,i):
+		functions = [
+			lambda x,y : hat_function(10,x,self.advantage_reference,y),
+			lambda x,y : hat_function(20,50,25,y)+hat_function(1,52.5,75,y),
+		]
+		return functions[i]
+
+	"""
+	def compute_advantage_function(self):
+		return lambda x,y : hat_function(20,50,25,y)+hat_function(1,52.5,75,y)
+	"""
+
+
+
+

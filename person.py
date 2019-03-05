@@ -58,8 +58,8 @@ class Person():
 	def compute_advantage_score(self,advantage_reference):
 		return int(self.advantage)*hat_function(10,self.advantage_scale,advantage_reference,self.gene_rate["innervalue"])
 
-	def new_score(self,advantage_reference):
-		self.score = randint(1,100)+self.compute_advantage_score(advantage_reference)
+	def new_score(self,advantage_function):
+		self.score = randint(1,100)+int(self.advantage)*advantage_function(self.advantage_scale,self.gene_rate["innervalue"])
 		return self.score
 
 	def give_birth(self):
